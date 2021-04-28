@@ -5,8 +5,6 @@ const TeacherSchema = new Schema({
   first_name: { type: String, required: true, maxLength: 100 },
   family_name: { type: String, required: true, maxLength: 100 },
   age: { type: Number, required: true, min: 21 },
-  department: { type: Schema.Types.ObjectId, ref: "Department" },
-  lessons: [{ type: Schema.Types.ObjectId, ref: "Lesson" }],
 });
 
 //Virtual for full name

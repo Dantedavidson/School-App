@@ -10,7 +10,13 @@ const DepartmentSchema = new Schema({
       required: true,
     },
   ],
-  lessons: [{ type: Schema.Types.ObjectId, ref: "Lesson" }],
+  lessons: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Lesson",
+      required: true,
+    },
+  ],
 });
 
 //Virtual for url

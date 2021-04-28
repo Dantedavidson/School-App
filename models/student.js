@@ -4,12 +4,6 @@ const Schema = mongoose.Schema;
 const StudentSchema = new Schema({
   first_name: { type: String, required: true, maxLength: 100 },
   family_name: { type: String, required: true, maxLength: 100 },
-  year_group: {
-    type: Schema.Types.ObjectId,
-    ref: "Year_group",
-    required: true,
-  },
-  lessons: [{ type: Schema.Types.ObjectId, ref: "Lesson" }],
 });
 
 //Virtual for full name
