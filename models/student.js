@@ -19,7 +19,7 @@ StudentSchema.virtual("name").get(function () {
 
 //Virtual for url
 StudentSchema.virtual("url").get(function () {
-  return `/catalog/author/${this._id}`;
+  return `/students/${this._id}`;
 });
 
 module.exports = mongoose.model("Student", StudentSchema);
