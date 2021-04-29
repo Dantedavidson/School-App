@@ -3,6 +3,8 @@ const app = express();
 require("dotenv").config();
 const PORT = 3000;
 
+app.use(express.json());
+
 //Connect to mongodb
 const mongoose = require("mongoose");
 const mongoDB = process.env.MONGO_DB_CONNECTION_STRING;

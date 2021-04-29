@@ -7,14 +7,12 @@ const DepartmentSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "Teacher",
-      required: true,
     },
   ],
   lessons: [
     {
       type: Schema.Types.ObjectId,
       ref: "Lesson",
-      required: true,
     },
   ],
 });
