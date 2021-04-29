@@ -1,4 +1,5 @@
 const Teacher = require("../models/teacher");
+const Department = require("../models/department");
 const Helper = require("./controllerHelperFunctions");
 
 exports.teacher_list = async (req, res) => {
@@ -12,8 +13,11 @@ exports.teacher_list = async (req, res) => {
 
 exports.teacher_single = async (req, res) => {
   try {
+    let department = await Department.find({
+      teachers: `${req.params.id}`,
+    });
     let single = await Teacher.findById(req.params.id);
-    res.json(single);
+    res.json({ teacher_info: single, department_info: department });
   } catch (err) {
     res.json({ message: err });
   }

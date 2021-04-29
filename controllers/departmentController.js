@@ -38,14 +38,17 @@ exports.department_create = async (req, res) => {
 };
 
 exports.department_update = async (req, res) => {
+  if (!req.body.name || !req.body.teacher)
+    return res.json({ message: "Incomplete request" });
   try {
-    const prev = await Department.findById(req.params.id);
+    //const prev = await Department.findById(req.params.id);
     const update = await Department.updateOne(
       { _id: req.params.id },
       {
-        $set: { name: req.body.name ? req.body.name : prev.name },
+        $set: { name: req.body.name },
         $push: {
-          teachers: req.body.teacher ? req.body.teacher : prev.teachers,
+          teachers: req.body.teacher,
+          lessons: req.body.lessons,
         },
       }
     );
