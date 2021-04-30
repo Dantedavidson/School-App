@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const YearGroupSchema = new Schema({
   year_group: { type: Number, required: true, min: 7, max: 13 },
-  year_leader: { type: Schema.Types.ObjectId, ref: "Teacher" },
+  year_leader: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
   students: [{ type: Schema.Types.ObjectId, ref: "Student" }],
 });
 

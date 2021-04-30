@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const Department = require("../models/department");
 
 const TeacherSchema = new Schema({
   first_name: { type: String, required: true, maxLength: 100 },
@@ -10,7 +9,7 @@ const TeacherSchema = new Schema({
 
 //Virtual for full name
 TeacherSchema.virtual("name").get(function () {
-  return `${this.family_name}, ${this.first_name}`;
+  return `${this.first_name} ${this.family_name}`;
 });
 
 //Virtual for url

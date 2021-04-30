@@ -38,29 +38,53 @@ exports.department_create = async (req, res) => {
 };
 
 exports.department_update = async (req, res) => {
-  if (!req.body.name || !req.body.teacher)
-    return res.json({ message: "Incomplete request" });
+  // if (!req.body.name || !req.body.teacher || !req.body.lesson)
+  //   return res.json({ message: "Incomplete request" });
   try {
-    //const prev = await Department.findById(req.params.id);
+    const prev = await Department.findById(req.params.id);
+
+    //temp object
+    const temp = {
+      name: prev.name,
+      teachers: prev.teachers,
+      lessons: prev.lessons,
+    };
+
+    //check fields passed in
+    if (req.body.name) {
+      temp.name = req.body.name;
+    }
+    if (req.body.teacher) {
+      temp.teachers.push(req.body.teacher);
+    }
+    if (req.body.lesson) {
+      temp.lessons.push(req.body.lesson);
+    }
+
+    //update database
     const update = await Department.updateOne(
       { _id: req.params.id },
       {
-        $set: { name: req.body.name },
-        $push: {
-          teachers: req.body.teacher,
-          lessons: req.body.lessons,
+        $set: {
+          name: temp.name,
+          teachers: temp.teachers,
+          lessons: temp.lessons,
         },
       }
     );
+
+    //return update to user
     res.json(update);
   } catch (err) {
     res.json({ message: err });
   }
 };
 
-exports.department_remove = (req, res) =>
-  res.send(`department with id ${req.params.id} removed`);
-
-// exports.department_populate = (req,res)=>{
-
-// }
+exports.department_remove = (req, res) => {
+  try {
+    const removed = Department.remove({ _id: req.params.id });
+    res.json({ removed: removed, message: "Department removed" });
+  } catch (err) {
+    res.json({ message: err });
+  }
+};

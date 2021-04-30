@@ -37,8 +37,14 @@ exports.teacher_create = async (req, res) => {
   }
 };
 
-exports.teacher_update = (req, res) =>
+exports.teacher_update = async (req, res) =>
   res.send(`teacher with id ${req.params.id} updated`);
 
-exports.teacher_remove = (req, res) =>
-  res.send(`teacher with id ${req.params.id} removed`);
+exports.teacher_remove = async (req, res) => {
+  try {
+    const removed = await Teacher.remove({ _id: req.params.id });
+    res.json({ removed: removed, message: "Teacher removed" });
+  } catch (err) {
+    res.send({ message: err });
+  }
+};
