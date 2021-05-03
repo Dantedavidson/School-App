@@ -42,7 +42,7 @@ exports.teacher_update = async (req, res) =>
 
 exports.teacher_remove = async (req, res) => {
   try {
-    const removed = await Teacher.remove({ _id: req.params.id });
+    const removed = await Teacher.deleteOne({ _id: req.params.id });
     res.json({ removed: removed, message: "Teacher removed" });
   } catch (err) {
     res.send({ message: err });

@@ -80,11 +80,12 @@ exports.department_update = async (req, res) => {
   }
 };
 
-exports.department_remove = (req, res) => {
+exports.department_remove = async (req, res) => {
   try {
-    const removed = Department.remove({ _id: req.params.id });
+    const removed = await Department.deleteOne({ _id: req.params.id });
     res.json({ removed: removed, message: "Department removed" });
   } catch (err) {
+    console.log(err);
     res.json({ message: err });
   }
 };

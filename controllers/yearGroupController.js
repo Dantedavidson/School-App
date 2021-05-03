@@ -24,10 +24,10 @@ exports.yearGroup_create = async (req, res) => {
   const yearGroup = new YearGroup({
     year_group: req.body.year_group,
     year_leader: req.body.year_leader,
-    students: req.body.students ? req.body.students : [],
+    students: [],
   });
   try {
-    const exists = await Helper.inDatabase(
+    const yearGroupExists = await Helper.inDatabase(
       YearGroup,
       "year_group",
       req.body.year_group
@@ -37,11 +37,19 @@ exports.yearGroup_create = async (req, res) => {
       "year_leader",
       req.body.year_leader
     );
-    if (!exists && !yearLeaderExists) {
+
+    //Cheack if students are in another yeargroup
+    if (req.body.students.length > 0) {
+      let obj = await Helper.studentsInYearGroup(req.body.students, YearGroup);
+      if (obj.err) return res.json({ message: obj.message });
+      obj.students.forEach((student) => yearGroup.students.push(student));
+    }
+
+    if (!yearGroupExists && !yearLeaderExists) {
       const saved = await yearGroup.save();
       return res.json(saved);
     }
-    if (exists) {
+    if (yearGroupExists) {
       return res.json({ message: "This year group already exists" });
     }
     if (yearLeaderExists) {
@@ -56,8 +64,38 @@ exports.yearGroup_create = async (req, res) => {
   }
 };
 
-exports.yearGroup_update = async (req, res) =>
-  res.send(`Year group with id ${req.params.id} updated`);
+exports.yearGroup_update = async (req, res) => {
+  try {
+    //Make copy of previous year
+    const prev = await YearGroup.findOne({ _id: req.params.id });
+    const temp = {
+      year_leader: prev.year_leader,
+      students: prev.students,
+    };
+    //set year leader
+    if (req.body.year_leader) {
+      temp.year_leader = req.body.year_leader;
+    }
+
+    //check if students are in another yeargroup
+    if (req.body.students.length > 0) {
+      let obj = await Helper.studentsInYearGroup(req.body.students, YearGroup);
+      if (obj.err) return res.json({ message: obj.message });
+      obj.students.forEach((student) => temp.students.push(student));
+    }
+
+    const update = await YearGroup.updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          year_leader: temp.year_leader,
+          students: temp.students,
+        },
+      }
+    );
+    res.json(update);
+  } catch (err) {}
+};
 
 exports.yearGroup_remove = async (req, res) => {
   try {

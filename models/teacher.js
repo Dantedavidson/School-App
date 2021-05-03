@@ -17,4 +17,35 @@ TeacherSchema.virtual("url").get(function () {
   return `/teachers/${this._id}`;
 });
 
+//Delete all references to teacher
+TeacherSchema.pre("deleteOne", function (next) {
+  const teacherId = this.getQuery()["_id"];
+  mongoose
+    .model("Department")
+    .updateMany(
+      { teachers: teacherId },
+      { $pull: { teachers: `${teacherId}` } },
+      function (err, result) {
+        if (err) {
+          console.log(`[error] ${err}`);
+          next(err);
+        } else {
+          console.log("removed from department");
+          next();
+        }
+      }
+    );
+  mongoose
+    .model("Lesson")
+    .deleteMany({ teacher: teacherId }, function (err, result) {
+      if (err) {
+        console.log(`Lesson [error] ${err}`);
+        next(err);
+      } else {
+        console.log("Removed from lessons");
+        next();
+      }
+    });
+});
+
 module.exports = mongoose.model("Teacher", TeacherSchema);
