@@ -27,11 +27,9 @@ TeacherSchema.pre("deleteOne", function (next) {
       { $pull: { teachers: `${teacherId}` } },
       function (err, result) {
         if (err) {
-          console.log(`[error] ${err}`);
-          next(err);
-        } else {
-          console.log("removed from department");
-          next();
+          return res.json({
+            message: "Something went wrong when deleting from depatrtment",
+          });
         }
       }
     );
@@ -39,10 +37,10 @@ TeacherSchema.pre("deleteOne", function (next) {
     .model("Lesson")
     .deleteMany({ teacher: teacherId }, function (err, result) {
       if (err) {
-        console.log(`Lesson [error] ${err}`);
-        next(err);
+        return res.json({
+          message: "Something went wrong when removing from lesson",
+        });
       } else {
-        console.log("Removed from lessons");
         next();
       }
     });

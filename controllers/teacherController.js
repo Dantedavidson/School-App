@@ -37,8 +37,39 @@ exports.teacher_create = async (req, res) => {
   }
 };
 
-exports.teacher_update = async (req, res) =>
-  res.send(`teacher with id ${req.params.id} updated`);
+exports.teacher_update = async (req, res) => {
+  try {
+    const prev = await Teacher.findById(req.params.id);
+    const obj = {
+      first_name: prev.first_name,
+      family_name: prev.family_name,
+      age: prev.age,
+    };
+    if (req.body.first_name) {
+      obj.first_name = req.body.first_name;
+    }
+    if (req.body.family_name) {
+      obj.family_name = req.body.family_name;
+    }
+    if (req.body.age) {
+      obj.age = req.body.age;
+    }
+
+    const update = await Teacher.updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          first_name: obj.first_name,
+          family_name: obj.family_name,
+          age: obj.age,
+        },
+      }
+    );
+    res.json(update);
+  } catch (err) {
+    res.json({ message: `${err}` });
+  }
+};
 
 exports.teacher_remove = async (req, res) => {
   try {

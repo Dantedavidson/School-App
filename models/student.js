@@ -11,9 +11,35 @@ StudentSchema.virtual("name").get(function () {
   return `${this.family_name}, ${this.first_name}`;
 });
 
-//Virtual for url
-StudentSchema.virtual("url").get(function () {
-  return `/students/${this._id}`;
+//Remove all references of student
+StudentSchema.pre("deleteOne", function (next) {
+  const studentId = this.getQuery(["_id"]);
+  mongoose
+    .model("Lesson")
+    .updateMany(
+      { students: studentId },
+      { $pull: { students: studentId } },
+      function (err, result) {
+        if (err) {
+          return res.json({
+            message: "Something went wrong when deleting from Lesson",
+          });
+        }
+      }
+    );
+  mongoose
+    .model("YearGroup")
+    .updateOne(
+      { students: studentId },
+      { $pull: { students: studentId } },
+      function (err, result) {
+        if (err) {
+          return res.json({
+            message: "Something went wrong when deleting from Year group",
+          });
+        }
+      }
+    );
 });
 
 module.exports = mongoose.model("Student", StudentSchema);

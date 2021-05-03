@@ -38,8 +38,6 @@ exports.department_create = async (req, res) => {
 };
 
 exports.department_update = async (req, res) => {
-  // if (!req.body.name || !req.body.teacher || !req.body.lesson)
-  //   return res.json({ message: "Incomplete request" });
   try {
     const prev = await Department.findById(req.params.id);
 
