@@ -30,6 +30,7 @@ exports.yearGroup_create = async (req, res) => {
     students: [],
   });
   try {
+    // Check if yeargroup or yearleader exist
     const yearGroupExists = await Helper.inDatabase(
       YearGroup,
       "year_group",

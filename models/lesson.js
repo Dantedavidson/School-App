@@ -1,3 +1,5 @@
+const Joi = require("joi");
+const JoiObj = require("joi-oid");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -11,9 +13,14 @@ const LessonSchema = new Schema({
   students: [{ type: Schema.Types.ObjectId, ref: "Student" }],
 });
 
-//Virtual for url
-LessonSchema.virtual("url").get(function () {
-  return `/lessons/${this._id}`;
-});
-
-module.exports = mongoose.model("Lesson", LessonSchema);
+const validateLesson = (Lesson) => {
+  const schema = Joi.object({
+    name: Joi.string().min(2).max(50).required(),
+    teacher: JoiObj.objectId().required(),
+    students: Joi.array().items(JoiObj.objectId()),
+  });
+  return schema.validate(Lesson);
+};
+const Lesson = mongoose.model("Lesson", LessonSchema);
+module.exports.Lesson = Lesson;
+module.exports.validateLesson = validateLesson;

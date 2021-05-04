@@ -1,4 +1,4 @@
-const Department = require("../models/department");
+const { Department, validateDepartment } = require("../models/department");
 const Helper = require("./controllerHelperFunctions");
 
 exports.department_list = async (req, res) => {
@@ -20,6 +20,9 @@ exports.department_single = async (req, res) => {
 };
 
 exports.department_create = async (req, res) => {
+  let { error } = validateDepartment(req.body);
+  if (error) res.json(error);
+  console.log("i went off");
   const department = new Department({
     name: req.body.name,
     teachers: req.body.teachers ? req.body.teachers : [],

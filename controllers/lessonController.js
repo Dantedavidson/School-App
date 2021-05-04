@@ -1,4 +1,4 @@
-const Lesson = require("../models/lesson");
+const { Lesson, validateLesson } = require("../models/lesson");
 const Helper = require("./controllerHelperFunctions");
 
 exports.lesson_list = async (req, res) => {
@@ -20,6 +20,8 @@ exports.lesson_single = async (req, res) => {
 };
 
 exports.lesson_create = async (req, res) => {
+  let { error } = validateLesson(req.body);
+  if (error) return res.json(error);
   const lesson = new Lesson({
     name: req.body.name,
     teacher: req.body.teacher,

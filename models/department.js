@@ -1,3 +1,5 @@
+const Joi = require("joi");
+const JoiObj = require("joi-oid");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -17,9 +19,14 @@ const DepartmentSchema = new Schema({
   ],
 });
 
-//Virtual for url
-DepartmentSchema.virtual("url").get(function () {
-  return `/departments/${this._id}`;
-});
-
-module.exports = mongoose.model("Department", DepartmentSchema);
+const validateDepartment = (Department) => {
+  const schema = Joi.object({
+    name: Joi.string().min(2).max(50).required(),
+    teachers: Joi.array().items(JoiObj.objectId()),
+    lessons: Joi.array().items(JoiObj.objectId()),
+  });
+  return schema.validate(Department);
+};
+const Department = mongoose.model("Department", DepartmentSchema);
+module.exports.Department = Department;
+module.exports.validateDepartment = validateDepartment;
