@@ -1,3 +1,5 @@
+const Joi = require("joi");
+const JoiObj = require("joi-oid");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -12,4 +14,14 @@ YearGroupSchema.virtual("url").get(function () {
   return `/yeargroups/${this._id}`;
 });
 
-module.exports = mongoose.model("Year_group", YearGroupSchema);
+const validateYearGroup = (YearGroup) => {
+  const schema = Joi.object({
+    year_group: Joi.number().min(7).max(13).required(),
+    year_leader: JoiObj.objectId().required(),
+    students: Joi.array().items(JoiObj.objectId()),
+  });
+  return schema.validate(YearGroup);
+};
+const YearGroup = mongoose.model("YearGroup", YearGroupSchema);
+module.exports.YearGroup = YearGroup;
+module.exports.validateYearGroup = validateYearGroup;

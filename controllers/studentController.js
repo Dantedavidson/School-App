@@ -1,4 +1,4 @@
-const Student = require("../models/student");
+const { Student, validateStudent } = require("../models/student");
 
 exports.student_list = async (req, res) => {
   try {
@@ -19,6 +19,8 @@ exports.student_single = async (req, res) => {
 };
 
 exports.student_create = async (req, res) => {
+  let { error } = validateStudent(req.body);
+  if (error) res.json(error);
   const student = new Student({
     first_name: req.body.first_name,
     family_name: req.body.family_name,

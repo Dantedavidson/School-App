@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const Joi = require("joi");
 
 const StudentSchema = new Schema({
   first_name: { type: String, required: true, maxLength: 100 },
@@ -42,4 +43,13 @@ StudentSchema.pre("deleteOne", function (next) {
     );
 });
 
-module.exports = mongoose.model("Student", StudentSchema);
+const validateStudent = (student) => {
+  const schema = Joi.object({
+    first_name: Joi.string().min(1).max(100).required(),
+    family_name: Joi.string().min(3).max(100).required(),
+  });
+  return schema.validate(student);
+};
+const Student = mongoose.model("Student", StudentSchema);
+module.exports.Student = Student;
+module.exports.validateStudent = validateStudent;

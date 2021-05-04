@@ -1,6 +1,7 @@
-const YearGroup = require("../models/yearGroup");
-const Teacher = require("../models/teacher");
+const { YearGroup, validateYearGroup } = require("../models/yearGroup");
+const { Teacher } = require("../models/teacher");
 const Helper = require("./controllerHelperFunctions");
+/// FIXME Obj id can be added even if its a reference to the wrong document
 
 exports.yearGroup_list = async (req, res) => {
   try {
@@ -21,6 +22,8 @@ exports.yearGroup_single = async (req, res) => {
 };
 
 exports.yearGroup_create = async (req, res) => {
+  let { error } = validateYearGroup(req.body);
+  if (error) return res.json(error);
   const yearGroup = new YearGroup({
     year_group: req.body.year_group,
     year_leader: req.body.year_leader,
@@ -39,7 +42,7 @@ exports.yearGroup_create = async (req, res) => {
     );
 
     //Cheack if students are in another yeargroup
-    if (req.body.students.length > 0) {
+    if (req.body.students && req.body.students.length > 0) {
       let obj = await Helper.studentsInYearGroup(req.body.students, YearGroup);
       if (obj.err) return res.json({ message: obj.message });
       obj.students.forEach((student) => yearGroup.students.push(student));
@@ -60,7 +63,7 @@ exports.yearGroup_create = async (req, res) => {
     }
     return res.json({ message: "Unexpected error" });
   } catch (err) {
-    res.json({ message: err });
+    res.json({ message: `${err}` });
   }
 };
 
@@ -99,7 +102,7 @@ exports.yearGroup_update = async (req, res) => {
 
 exports.yearGroup_remove = async (req, res) => {
   try {
-    const removed = await YearGroup.remove({ _id: req.params.id });
+    const removed = await YearGroup.deleteOne({ _id: req.params.id });
     res.json({ removed: removed, message: "Year group removed" });
   } catch (err) {
     res.json({ message: err });

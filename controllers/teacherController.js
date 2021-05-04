@@ -1,4 +1,4 @@
-const Teacher = require("../models/teacher");
+const { Teacher, validateTeacher } = require("../models/teacher");
 const Department = require("../models/department");
 const Helper = require("./controllerHelperFunctions");
 
@@ -24,6 +24,8 @@ exports.teacher_single = async (req, res) => {
 };
 
 exports.teacher_create = async (req, res) => {
+  let { error } = validateTeacher(req.body);
+  if (error) res.json(error);
   const teacher = new Teacher({
     first_name: req.body.first_name,
     family_name: req.body.family_name,
