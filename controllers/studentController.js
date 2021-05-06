@@ -51,6 +51,10 @@ exports.student_update = async (req, res) => {
       temp.family_name = req.body.family_name;
     }
 
+    //Validate
+    let { error } = validateStudent(temp);
+    if (error) return res.json(error);
+
     //Update fields
     const update = await Student.updateOne(
       { _id: req.params.id },

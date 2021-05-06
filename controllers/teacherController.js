@@ -25,7 +25,7 @@ exports.teacher_single = async (req, res) => {
 
 exports.teacher_create = async (req, res) => {
   let { error } = validateTeacher(req.body);
-  if (error) res.json(error);
+  if (error) return res.json(error);
   const teacher = new Teacher({
     first_name: req.body.first_name,
     family_name: req.body.family_name,
@@ -56,6 +56,9 @@ exports.teacher_update = async (req, res) => {
     if (req.body.age) {
       obj.age = req.body.age;
     }
+
+    let { error } = validateTeacher(obj);
+    if (error) return res.json(error);
 
     const update = await Teacher.updateOne(
       { _id: req.params.id },

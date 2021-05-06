@@ -1,7 +1,10 @@
+//Takes of model, field and value. Queries the field in the model for that value
 exports.inDatabase = async (model, field, value) => {
   const exists = await model.where(field, `${value}`);
   return exists.length;
 };
+
+//Takes an array of students and checks each one against yeargroup model. Returns array of students who aren't in any yeargroups
 exports.studentsInYearGroup = async function (students, model) {
   const obj = {
     students: [],
@@ -22,13 +25,3 @@ exports.studentsInYearGroup = async function (students, model) {
   }
   return obj;
 };
-
-// if (req.body.students.length > 0) {
-//   for await (const yeargroups of req.body.students.map((student) => ({
-//     year: YearGroup.find({ students: student }),
-//     student: student,
-//   }))) {
-//     let tempYear = await yeargroups.year;
-//     tempYear.length > 0 ? null : temp.students.push(yeargroups.student);
-//   }
-// }

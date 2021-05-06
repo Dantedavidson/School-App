@@ -25,10 +25,13 @@ exports.lesson_create = async (req, res) => {
   const lesson = new Lesson({
     name: req.body.name,
     teacher: req.body.teacher,
-    students: req.body.students ? req.body.students : [],
+    students: [],
   });
   try {
     const exists = await Helper.inDatabase(Lesson, "name", req.body.name);
+    if (req.body.students) {
+      req.body.students.forEach((student) => lesson.students.push(student));
+    }
     if (!exists) {
       const saved = await lesson.save();
       return res.json({ saved: saved, message: "Lesson saved" });
@@ -58,6 +61,8 @@ exports.lesson_update = async (req, res) => {
         obj.students.includes(student) ? null : obj.students.push(student);
       });
     }
+    let { error } = validateLesson(obj);
+    if (error) return res.json(error);
     const update = await Lesson.updateOne(
       { _id: req.params.id },
       { $set: { name: obj.name, teacher: obj.teacher, students: obj.students } }

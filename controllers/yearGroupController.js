@@ -87,7 +87,10 @@ exports.yearGroup_update = async (req, res) => {
       if (obj.err) return res.json({ message: obj.message });
       obj.students.forEach((student) => temp.students.push(student));
     }
-
+    //validate
+    let { error } = validateYearGroup(temp);
+    if (error) return res.json(error);
+    //update
     const update = await YearGroup.updateOne(
       { _id: req.params.id },
       {

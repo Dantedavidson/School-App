@@ -25,12 +25,20 @@ exports.department_create = async (req, res) => {
   console.log("i went off");
   const department = new Department({
     name: req.body.name,
-    teachers: req.body.teachers ? req.body.teachers : [],
-    lessons: req.body.lessons ? req.body.lessons : [],
+    teachers: [],
+    lessons: [],
   });
   try {
     let exists = await Helper.inDatabase(Department, "name", req.body.name);
     if (!exists) {
+      if (req.body.teachers) {
+        req.body.teachers.forEach((teacher) =>
+          department.teachers.push(teacher)
+        );
+      }
+      if (req.body.lessons) {
+        req.body.lessons.forEach((lesson) => department.lesson.push(lesson));
+      }
       const saved = await department.save();
       return res.json(saved);
     }
@@ -62,6 +70,9 @@ exports.department_update = async (req, res) => {
       temp.lessons.push(req.body.lesson);
     }
 
+    //Validate
+    let { error } = validateDepartment(temp);
+    if (error) res.json(error);
     //update database
     const update = await Department.updateOne(
       { _id: req.params.id },
