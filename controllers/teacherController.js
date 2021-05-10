@@ -1,5 +1,6 @@
 const { Teacher, validateTeacher } = require("../models/teacher");
-const Department = require("../models/department");
+const { Department } = require("../models/department");
+const bycrypt = require("bcrypt");
 const Helper = require("./controllerHelperFunctions");
 
 exports.teacher_list = async (req, res) => {
@@ -24,11 +25,35 @@ exports.teacher_single = async (req, res) => {
 };
 
 exports.teacher_create = async (req, res) => {
+  //validate
   let { error } = validateTeacher(req.body);
   if (error) return res.json(error);
+
+  //check account info is unique
+  const user = await Teacher.findOne({
+    $or: [
+      { "info.contact.email": req.body.info.contact.email },
+      { "info.account.username": req.body.info.account.username },
+    ],
+  });
+  if (user) return res.send("This user already exists");
+
+  //hash password
+  const salt = await bcrypt.genSalt(10);
+
   const teacher = new Teacher({
     first_name: req.body.first_name,
     family_name: req.body.family_name,
+    info: {
+      account: {
+        username: req.body.info.account.username,
+        password: req.body.info.account.password,
+      },
+      contact: {
+        email: req.body.info.contact.email,
+        phone: req.body.info.contact.phone,
+      },
+    },
     age: req.body.age,
   });
   try {
