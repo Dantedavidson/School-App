@@ -9,6 +9,7 @@ const TeacherSchema = new Schema({
     account: {
       username: { type: String, required: true, maxLength: 36, minLength: 6 },
       password: { type: String, required: true, maxLength: 1024, minLength: 6 },
+      access: { type: String, enum: ["teacher"], default: "teacher" },
     },
     contact: {
       email: { type: String, maxLength: 100, minLength: 3 },

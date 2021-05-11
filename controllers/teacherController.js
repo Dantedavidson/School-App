@@ -1,6 +1,6 @@
 const { Teacher, validateTeacher } = require("../models/teacher");
 const { Department } = require("../models/department");
-const bycrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const Helper = require("./controllerHelperFunctions");
 
 exports.teacher_list = async (req, res) => {
@@ -40,6 +40,10 @@ exports.teacher_create = async (req, res) => {
 
   //hash password
   const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(
+    req.body.info.account.password,
+    salt
+  );
 
   const teacher = new Teacher({
     first_name: req.body.first_name,
@@ -47,7 +51,7 @@ exports.teacher_create = async (req, res) => {
     info: {
       account: {
         username: req.body.info.account.username,
-        password: req.body.info.account.password,
+        password: hashedPassword,
       },
       contact: {
         email: req.body.info.contact.email,
@@ -65,33 +69,32 @@ exports.teacher_create = async (req, res) => {
 };
 
 exports.teacher_update = async (req, res) => {
+  let { error } = validateTeacher(req.body);
+  if (error) return res.json(error);
   try {
-    const prev = await Teacher.findById(req.params.id);
-    const obj = {
-      first_name: prev.first_name,
-      family_name: prev.family_name,
-      age: prev.age,
-    };
-    if (req.body.first_name) {
-      obj.first_name = req.body.first_name;
-    }
-    if (req.body.family_name) {
-      obj.family_name = req.body.family_name;
-    }
-    if (req.body.age) {
-      obj.age = req.body.age;
-    }
-
-    let { error } = validateTeacher(obj);
-    if (error) return res.json(error);
-
+    //hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(
+      req.body.info.account.password,
+      salt
+    );
     const update = await Teacher.updateOne(
       { _id: req.params.id },
       {
         $set: {
-          first_name: obj.first_name,
-          family_name: obj.family_name,
-          age: obj.age,
+          first_name: req.body.first_name,
+          family_name: req.body.family_name,
+          age: req.body.age,
+          info: {
+            account: {
+              username: req.body.info.account.username,
+              password: hashedPassword,
+            },
+            contact: {
+              email: req.body.info.contact.email,
+              phone: req.body.info.contact.phone,
+            },
+          },
         },
       }
     );
