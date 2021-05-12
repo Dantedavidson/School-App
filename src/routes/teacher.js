@@ -14,6 +14,10 @@ router.get("/:id", teacherController.teacher_single);
 //PUT update teacher details
 router.put("/:id", teacherController.teacher_update);
 
+//POST login as teacher
+
+router.post("/login", teacherController.teacher_login);
+
 ///ADMIN///
 
 //POST create a teacher

@@ -5,11 +5,17 @@ const Joi = require("joi");
 const StudentSchema = new Schema({
   first_name: { type: String, required: true, maxLength: 100 },
   family_name: { type: String, required: true, maxLength: 100 },
-});
-
-//Virtual for full name
-StudentSchema.virtual("name").get(function () {
-  return `${this.family_name}, ${this.first_name}`;
+  info: {
+    account: {
+      username: { type: String, required: true, maxLength: 36, minLength: 6 },
+      password: { type: String, required: true, maxLength: 1024, minLength: 6 },
+      access: { type: String, enum: ["student"], default: "student" },
+    },
+    contact: {
+      email: { type: String, maxLength: 100, minLength: 3 },
+      phone: { type: String, maxLength: 10, minLength: 8 },
+    },
+  },
 });
 
 //Remove all references of student
@@ -47,6 +53,19 @@ const validateStudent = (student) => {
   const schema = Joi.object({
     first_name: Joi.string().min(1).max(100).required(),
     family_name: Joi.string().min(3).max(100).required(),
+    info: {
+      account: {
+        username: Joi.string().min(6).max(36).required(),
+        password: Joi.string().min(6).max(36).required(),
+      },
+      contact: {
+        email: Joi.string().min(3).max(100).email(),
+        phone: Joi.string()
+          .min(8)
+          .max(10)
+          .regex(/[0-9]{8,10}/),
+      },
+    },
   });
   return schema.validate(student);
 };

@@ -19,16 +19,6 @@ const TeacherSchema = new Schema({
   age: { type: Number, required: true, min: 21 },
 });
 
-//Virtual for full name
-TeacherSchema.virtual("name").get(function () {
-  return `${this.first_name} ${this.family_name}`;
-});
-
-//Virtual for url
-TeacherSchema.virtual("url").get(function () {
-  return `/teachers/${this._id}`;
-});
-
 //Delete all references to teacher
 TeacherSchema.pre("deleteOne", function (next) {
   const teacherId = this.getQuery()["_id"];
@@ -65,7 +55,7 @@ const validateTeacher = (teacher) => {
     info: {
       account: {
         username: Joi.string().min(6).max(36).required(),
-        password: Joi.string().min(6).max(1024).required(),
+        password: Joi.string().min(6).max(36).required(),
       },
       contact: {
         email: Joi.string().min(3).max(100).email(),

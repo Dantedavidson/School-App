@@ -16,6 +16,10 @@ router.post("/", studentController.student_create);
 //PUT update student details
 router.put("/:id", studentController.student_update);
 
+//POST login as student
+
+router.post("/login", studentController.student_login);
+
 ///ADMIN///
 //TODO authorise delete for student and admin
 //DELETE remove a student
