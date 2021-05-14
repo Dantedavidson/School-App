@@ -6,7 +6,7 @@ exports.department_list = async (req, res) => {
     let all = await Department.find();
     res.json(all);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
@@ -15,13 +15,13 @@ exports.department_single = async (req, res) => {
     let single = await Department.findById(req.params.id).populate("teachers");
     res.json(single);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
 exports.department_create = async (req, res) => {
   let { error } = validateDepartment(req.body);
-  if (error) res.json(error);
+  if (error) res.status(400).json(error);
   console.log("i went off");
   const department = new Department({
     name: req.body.name,
@@ -42,9 +42,9 @@ exports.department_create = async (req, res) => {
       const saved = await department.save();
       return res.json(saved);
     }
-    return res.json({ message: "Department already exists" });
+    return res.status(409).json({ message: "Department already exists" });
   } catch (err) {
-    return res.send(`${err}`);
+    return res.status(400).send(`${err}`);
   }
 };
 
@@ -72,7 +72,7 @@ exports.department_update = async (req, res) => {
 
     //Validate
     let { error } = validateDepartment(temp);
-    if (error) res.json(error);
+    if (error) res.status(400).json({ message: "Invalid inputs" });
     //update database
     const update = await Department.updateOne(
       { _id: req.params.id },
@@ -88,7 +88,7 @@ exports.department_update = async (req, res) => {
     //return update to user
     res.json(update);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
@@ -97,7 +97,6 @@ exports.department_remove = async (req, res) => {
     const removed = await Department.deleteOne({ _id: req.params.id });
     res.json({ removed: removed, message: "Department removed" });
   } catch (err) {
-    console.log(err);
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };

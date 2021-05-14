@@ -8,7 +8,7 @@ exports.student_list = async (req, res) => {
     const all = await Student.find();
     res.json(all);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
@@ -17,13 +17,13 @@ exports.student_single = async (req, res) => {
     const single = await Student.findById(req.params.id);
     res.json(single);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
 exports.student_create = async (req, res) => {
   let { error } = validateStudent(req.body);
-  if (error) res.json(error);
+  if (error) res.status(400).json(error);
 
   //check account info is unique
   const user = await Student.findOne({
@@ -32,7 +32,7 @@ exports.student_create = async (req, res) => {
       { "info.account.username": req.body.info.account.username },
     ],
   });
-  if (user) return res.send("This user already exists");
+  if (user) return res.status(409).send("This user already exists");
   //hash password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(
@@ -57,7 +57,7 @@ exports.student_create = async (req, res) => {
     const saved = await student.save();
     res.json(saved);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
@@ -84,12 +84,9 @@ exports.student_login = async (req, res) => {
     );
 
     //Return user
-    res
-      .status(200)
-      .header("auth-token", token)
-      .json({ user: token, message: "Log in success" });
+    res.status(200).json({ user: token, message: "Log in success" });
   } catch (err) {
-    res.json({ message: `${err}` });
+    res.status(400).json({ message: `${err}` });
   }
 };
 
@@ -113,7 +110,7 @@ exports.student_update = async (req, res) => {
 
     //Validate
     let { error } = validateStudent(temp);
-    if (error) return res.json(error);
+    if (error) return res.status(400).json(error);
 
     //Update fields
     const update = await Student.updateOne(
@@ -129,8 +126,7 @@ exports.student_update = async (req, res) => {
     //return update to user
     res.json(update);
   } catch (err) {
-    console.log(err);
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
@@ -139,6 +135,6 @@ exports.student_remove = async (req, res) => {
     const removed = await Student.deleteOne({ _id: req.params.id });
     res.json({ removed: removed, message: "Student removed" });
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };

@@ -14,4 +14,7 @@ router.post("/login", adminController.admin_login);
 //POST create a admin
 router.post("/", adminController.admin_create);
 
+// router.post("/example",auth,controller)
+//
+
 module.exports = router;

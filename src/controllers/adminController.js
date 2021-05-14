@@ -6,13 +6,13 @@ const jwt = require("jsonwebtoken");
 exports.admin_create = async (req, res) => {
   //validate
   let { error } = validateAdmin(req.body);
-  if (error) return res.json(error);
+  if (error) return res.status(400).json(error);
 
   //check account info is unique
   const user = await Admin.findOne({
     username: req.body.username,
   });
-  if (user) return res.send("This user already exists");
+  if (user) return res.status(409).send("This user already exists");
 
   //hash password
   const salt = await bcrypt.genSalt(10);
@@ -26,7 +26,7 @@ exports.admin_create = async (req, res) => {
     const saved = await admin.save();
     return res.json(saved);
   } catch (err) {
-    return res.send(`${err}`);
+    return res.status(400).send(`${err}`);
   }
 };
 
@@ -58,6 +58,6 @@ exports.admin_login = async (req, res) => {
         message: `Log in success. Logged in as ${user.access}`,
       });
   } catch (err) {
-    res.json({ message: `${err}` });
+    res.status(400).json({ message: `${err}` });
   }
 };

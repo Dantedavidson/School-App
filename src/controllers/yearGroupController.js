@@ -8,7 +8,7 @@ exports.yearGroup_list = async (req, res) => {
     const all = await YearGroup.find();
     res.json(all);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
@@ -17,13 +17,13 @@ exports.yearGroup_single = async (req, res) => {
     const single = await YearGroup.findById({ _id: req.params.id });
     res.json(single);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
 exports.yearGroup_create = async (req, res) => {
   let { error } = validateYearGroup(req.body);
-  if (error) return res.json(error);
+  if (error) return res.status(400).json(error);
   const yearGroup = new YearGroup({
     year_group: req.body.year_group,
     year_leader: req.body.year_leader,
@@ -45,7 +45,7 @@ exports.yearGroup_create = async (req, res) => {
     //Cheack if students are in another yeargroup
     if (req.body.students && req.body.students.length > 0) {
       let obj = await Helper.studentsInYearGroup(req.body.students, YearGroup);
-      if (obj.err) return res.json({ message: obj.message });
+      if (obj.err) return res.status(400).json({ message: obj.message });
       obj.students.forEach((student) => yearGroup.students.push(student));
     }
 
@@ -54,17 +54,19 @@ exports.yearGroup_create = async (req, res) => {
       return res.json(saved);
     }
     if (yearGroupExists) {
-      return res.json({ message: "This year group already exists" });
+      return res
+        .status(409)
+        .json({ message: "This year group already exists" });
     }
     if (yearLeaderExists) {
       const temp = await Teacher.findById(req.body.year_leader);
-      return res.json({
+      return res.status(409).json({
         message: `${temp.name} is already a year head`,
       });
     }
-    return res.json({ message: "Unexpected error" });
+    return res.status(400).json({ message: "Unexpected error" });
   } catch (err) {
-    res.json({ message: `${err}` });
+    res.status(400).json({ message: `${err}` });
   }
 };
 
@@ -84,12 +86,12 @@ exports.yearGroup_update = async (req, res) => {
     //check if students are in another yeargroup
     if (req.body.students.length > 0) {
       let obj = await Helper.studentsInYearGroup(req.body.students, YearGroup);
-      if (obj.err) return res.json({ message: obj.message });
+      if (obj.err) return res.status(400).json({ message: obj.message });
       obj.students.forEach((student) => temp.students.push(student));
     }
     //validate
     let { error } = validateYearGroup(temp);
-    if (error) return res.json(error);
+    if (error) return res.status(400).json(error);
     //update
     const update = await YearGroup.updateOne(
       { _id: req.params.id },
@@ -101,7 +103,9 @@ exports.yearGroup_update = async (req, res) => {
       }
     );
     res.json(update);
-  } catch (err) {}
+  } catch (err) {
+    res.status(400).json({ message: `${err}` });
+  }
 };
 
 exports.yearGroup_remove = async (req, res) => {
@@ -109,6 +113,6 @@ exports.yearGroup_remove = async (req, res) => {
     const removed = await YearGroup.deleteOne({ _id: req.params.id });
     res.json({ removed: removed, message: "Year group removed" });
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: `${err}` });
   }
 };

@@ -10,7 +10,7 @@ exports.teacher_list = async (req, res) => {
     let all = await Teacher.find();
     res.json(all);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
@@ -22,14 +22,14 @@ exports.teacher_single = async (req, res) => {
     let single = await Teacher.findById(req.params.id);
     res.json({ teacher_info: single, department_info: department });
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 };
 
 exports.teacher_create = async (req, res) => {
   //validate
   let { error } = validateTeacher(req.body);
-  if (error) return res.json(error);
+  if (error) return res.status(400).json(error);
 
   //check account info is unique
   const user = await Teacher.findOne({
@@ -38,7 +38,7 @@ exports.teacher_create = async (req, res) => {
       { "info.account.username": req.body.info.account.username },
     ],
   });
-  if (user) return res.send("This user already exists");
+  if (user) return res.status(409).send("This user already exists");
 
   //hash password
   const salt = await bcrypt.genSalt(10);
@@ -66,7 +66,7 @@ exports.teacher_create = async (req, res) => {
     const saved = await teacher.save();
     return res.json(saved);
   } catch (err) {
-    return res.send(`${err}`);
+    return res.status(400).send(`${err}`);
   }
 };
 
@@ -98,13 +98,13 @@ exports.teacher_login = async (req, res) => {
       .header("auth-token", token)
       .json({ user: token, message: "Log in success" });
   } catch (err) {
-    res.json({ message: `${err}` });
+    res.status(400).json({ message: `${err}` });
   }
 };
 
 exports.teacher_update = async (req, res) => {
   let { error } = validateTeacher(req.body);
-  if (error) return res.json(error);
+  if (error) return res.status(400).json(error);
   try {
     //hash password
     const salt = await bcrypt.genSalt(10);
@@ -134,7 +134,7 @@ exports.teacher_update = async (req, res) => {
     );
     res.json(update);
   } catch (err) {
-    res.json({ message: `${err}` });
+    res.status(400).json({ message: `${err}` });
   }
 };
 
@@ -143,6 +143,6 @@ exports.teacher_remove = async (req, res) => {
     const removed = await Teacher.deleteOne({ _id: req.params.id });
     res.json({ removed: removed, message: "Teacher removed" });
   } catch (err) {
-    res.send({ message: err });
+    res.status(400).send({ message: err });
   }
 };
