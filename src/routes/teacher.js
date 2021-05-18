@@ -3,6 +3,13 @@ const router = express.Router();
 const teacherController = require("../controllers/teacherController");
 
 ///GENERAL///
+
+//GET recent teachers
+router.get("/recent", teacherController.teacher_recent);
+
+//GET year leaders
+router.get("/year-leaders", teacherController.year_leaders);
+
 //GET all teachers
 router.get("/", teacherController.teacher_list);
 

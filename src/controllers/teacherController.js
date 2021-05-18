@@ -1,6 +1,7 @@
 const { Teacher, validateTeacher } = require("../models/teacher");
 const validateLogin = require("../models/loginSchema");
 const { Department } = require("../models/department");
+const { YearGroup } = require("../models/yearGroup");
 const bcrypt = require("bcrypt");
 const Helper = require("./controllerHelperFunctions");
 const jwt = require("jsonwebtoken");
@@ -21,6 +22,27 @@ exports.teacher_single = async (req, res) => {
     });
     let single = await Teacher.findById(req.params.id);
     res.json({ teacher_info: single, department_info: department });
+  } catch (err) {
+    res.status(400).json({ message: err });
+  }
+};
+
+exports.year_leaders = async (req, res) => {
+  try {
+    let year_leaders = await YearGroup.find().select("year_leader");
+    console.log(year_leaders);
+    res.json(year_leaders);
+  } catch (err) {
+    res.status(400).json({ message: "Resource not found" });
+  }
+};
+
+exports.teacher_recent = async (req, res) => {
+  try {
+    let recent = await Teacher.find()
+      .sort({ "info.account.enrollment": -1 })
+      .limit(5);
+    res.json(recent);
   } catch (err) {
     res.status(400).json({ message: err });
   }
