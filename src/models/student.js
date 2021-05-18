@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Joi = require("joi");
+const { DateTime } = require("luxon");
 
 const StudentSchema = new Schema({
   first_name: { type: String, required: true, maxLength: 100 },
@@ -10,6 +11,7 @@ const StudentSchema = new Schema({
       username: { type: String, required: true, maxLength: 36, minLength: 6 },
       password: { type: String, required: true, maxLength: 1024, minLength: 6 },
       access: { type: String, enum: ["student"], default: "student" },
+      enrolled: { type: Date, required: true, default: DateTime.now() },
     },
     contact: {
       email: { type: String, maxLength: 100, minLength: 3 },

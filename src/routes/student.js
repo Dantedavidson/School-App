@@ -3,6 +3,9 @@ const router = express.Router();
 const studentController = require("../controllers/studentController");
 
 ///GENERAL///
+//GET recent students
+router.get("/recent", studentController.student_recent);
+
 //GET all students
 router.get("/", studentController.student_list);
 

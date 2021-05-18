@@ -21,9 +21,20 @@ exports.student_single = async (req, res) => {
   }
 };
 
+exports.student_recent = async (req, res) => {
+  try {
+    const recent = await Student.find()
+      .sort({ "info.account.enrolled": -1 })
+      .limit(5);
+    res.json(recent);
+  } catch (err) {
+    res.status(400).json({ message: err });
+  }
+};
+
 exports.student_create = async (req, res) => {
   let { error } = validateStudent(req.body);
-  if (error) res.status(400).json(error);
+  if (error) return res.status(400).json({ message: `${error}` });
 
   //check account info is unique
   const user = await Student.findOne({

@@ -1,11 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Joi = require("joi");
+const { DateTime } = require("luxon");
 
 const AdminSchema = new Schema({
   username: { type: String, required: true, maxLength: 36, minLength: 6 },
   password: { type: String, required: true, maxLength: 1024, minLength: 6 },
   access: { type: String, enum: ["admin"], default: "admin" },
+  enrolled: { type: Date, required: true, default: DateTime.now() },
 });
 
 const validateAdmin = (admin) => {
