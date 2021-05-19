@@ -8,7 +8,23 @@ const jwt = require("jsonwebtoken");
 
 exports.teacher_list = async (req, res) => {
   try {
-    let all = await Teacher.find();
+    let teachers = await Teacher.find();
+    // let all = teachers.map((teacher) => {
+    //   let department = await Department.find({ teachers: teacher._id });
+    //   return { ...teacher, department: department };
+    // });
+    let all = [];
+    for await (teacher of teachers) {
+      let department = await Department.find({ teachers: teacher._id }).select(
+        "name"
+      );
+      console.log(department);
+      all.push({
+        teacher,
+        department: department.length > 0 ? department[0].name : null,
+      });
+    }
+
     res.json(all);
   } catch (err) {
     res.status(400).json({ message: err });
@@ -29,7 +45,9 @@ exports.teacher_single = async (req, res) => {
 
 exports.year_leaders = async (req, res) => {
   try {
-    let year_leaders = await YearGroup.find().select("year_leader");
+    let year_leaders = await YearGroup.find()
+      .select("year_leader year_group")
+      .populate({ path: "year_leader", select: "_id first_name family_name" });
     console.log(year_leaders);
     res.json(year_leaders);
   } catch (err) {
