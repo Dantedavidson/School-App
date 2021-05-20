@@ -72,6 +72,7 @@ exports.teacher_recent = async (req, res) => {
 exports.teacher_create = async (req, res) => {
   //validate
   let { error } = validateTeacher(req.body);
+  console.log(error);
   if (error) return res.status(400).json(error);
 
   //check account info is unique

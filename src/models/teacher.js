@@ -71,8 +71,8 @@ const validateTeacher = (teacher) => {
           .regex(/[0-9]{8,10}/),
       },
     },
-    age: Joi.number().min(18).max(70).required(),
-    department: JoiObj.objectId(),
+    age: Joi.number().min(18).max(80).required(),
+    department: Joi.alternatives().try(JoiObj.objectId(), null),
   });
   return schema.validate(teacher);
 };

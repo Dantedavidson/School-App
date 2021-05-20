@@ -19,6 +19,9 @@ const StudentSchema = new Schema({
     },
   },
 });
+StudentSchema.virtual("fullname", function () {
+  return `${this.first_name} ${this.family_name}`;
+});
 
 //Remove all references of student
 StudentSchema.pre("deleteOne", function (next) {
