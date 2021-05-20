@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 
 exports.teacher_list = async (req, res) => {
   try {
-    let teachers = await Teacher.find();
+    let teachers = await Teacher.find().sort({ family_name: 1 });
     // let all = teachers.map((teacher) => {
     //   let department = await Department.find({ teachers: teacher._id });
     //   return { ...teacher, department: department };
@@ -18,10 +18,13 @@ exports.teacher_list = async (req, res) => {
       let department = await Department.find({ teachers: teacher._id }).select(
         "name"
       );
-      console.log(department);
       all.push({
-        teacher,
-        department: department.length > 0 ? department[0].name : null,
+        teacher: {
+          ...teacher._doc,
+          fullname: teacher.fullname,
+          department:
+            department.length > 0 ? department[0].name : "No Department",
+        },
       });
     }
 
@@ -103,6 +106,12 @@ exports.teacher_create = async (req, res) => {
     age: req.body.age,
   });
   try {
+    if (req.body.department) {
+      await Department.findByIdAndUpdate(
+        { _id: req.body.department },
+        { $push: { teachers: teacher._id } }
+      );
+    }
     const saved = await teacher.save();
     return res.json(saved);
   } catch (err) {

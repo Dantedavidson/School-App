@@ -14,7 +14,7 @@ app.use(express.json());
 //Connect to mongodb
 const mongoose = require("mongoose");
 const mongoDB = process.env.MONGO_DB_CONNECTION_STRING;
-
+mongoose.set("useFindAndModify", false);
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const db = mongoose.connection;

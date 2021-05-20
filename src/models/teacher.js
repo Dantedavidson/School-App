@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Joi = require("joi");
+const JoiObj = require("joi-oid");
 const { DateTime } = require("luxon");
 
 const TeacherSchema = new Schema({
@@ -21,6 +22,9 @@ const TeacherSchema = new Schema({
   age: { type: Number, required: true, min: 21 },
 });
 
+TeacherSchema.virtual("fullname").get(function () {
+  return `${this.first_name} ${this.family_name}`;
+});
 //Delete all references to teacher
 TeacherSchema.pre("deleteOne", function (next) {
   const teacherId = this.getQuery()["_id"];
@@ -68,6 +72,7 @@ const validateTeacher = (teacher) => {
       },
     },
     age: Joi.number().min(18).max(70).required(),
+    department: JoiObj.objectId(),
   });
   return schema.validate(teacher);
 };
