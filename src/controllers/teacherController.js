@@ -1,6 +1,5 @@
 //TODO Look at how you are sending/setting access tokens. Especially when you update. Maybe should be sent seperatly and not validated in joi.
 //TODO Maybe in the auth middleware you can check the header and then req.body.account.access = token.
-
 const {
   User: Teacher,
   validateUser,
@@ -11,6 +10,8 @@ const { YearGroup } = require("../models/yearGroup");
 const bcrypt = require("bcrypt");
 const Helper = require("./controllerHelperFunctions");
 const jwt = require("jsonwebtoken");
+
+//TODO Return if teacher is department head
 
 exports.teacher_list = async (req, res) => {
   try {

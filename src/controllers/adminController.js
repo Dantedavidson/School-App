@@ -1,15 +1,15 @@
-const { Admin, validateAdmin } = require("../models/admin");
+const { User: Admin, validateAccount } = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.admin_create = async (req, res) => {
   //validate
-  let { error } = validateAdmin(req.body);
+  let { error } = validateAccount(req.body);
   if (error) return res.status(400).json(error);
 
   //check account info is unique
   const user = await Admin.findOne({
-    username: req.body.username,
+    "account.username": req.body.username,
   });
   if (user) return res.status(409).send("This user already exists");
 
@@ -18,8 +18,11 @@ exports.admin_create = async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
   const admin = new Admin({
-    username: req.body.username,
-    password: hashedPassword,
+    account: {
+      username: req.body.username,
+      access: req.body.access,
+      password: hashedPassword,
+    },
   });
   try {
     const saved = await admin.save();
@@ -31,20 +34,23 @@ exports.admin_create = async (req, res) => {
 
 exports.admin_login = async (req, res) => {
   //Validate login details
-  const { error } = validateLogin(req.body);
+  const { error } = validateAccount(req.body);
   if (error) return res.status(400).json({ message: "Invalid Inputs" });
   try {
     //Check user exists
     const user = await Admin.findOne({
-      username: req.body.username,
+      "account.username": req.body.username,
     });
     if (!user) return res.status(400).json({ message: "User does not exist" });
     //Check password
-    const validPass = await bcrypt.compare(req.body.password, user.password);
+    const validPass = await bcrypt.compare(
+      req.body.password,
+      user.account.password
+    );
     if (!validPass)
       return res.status(400).json({ message: "Invalid password" });
     const token = jwt.sign(
-      { _id: user._id, access: user.access },
+      { _id: user._id, access: user.account.access },
       process.env.TOKEN_SECERET
     );
 

@@ -8,9 +8,10 @@ const DepartmentSchema = new Schema({
   teachers: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Teacher",
+      ref: "User",
     },
   ],
+  department_head: { type: Schema.Types.ObjectId, ref: "User" },
   lessons: [
     {
       type: Schema.Types.ObjectId,
@@ -23,10 +24,11 @@ const validateDepartment = (Department) => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(50).required(),
     teachers: Joi.array().items(JoiObj.objectId()),
+    department_head: JoiObj.objectId().required(),
     lessons: Joi.array().items(JoiObj.objectId()),
   });
   return schema.validate(Department);
 };
-const Department = mongoose.model("Department", DepartmentSchema);
-module.exports.Department = Department;
+
+module.exports.Department = mongoose.model("Department", DepartmentSchema);
 module.exports.validateDepartment = validateDepartment;

@@ -22,65 +22,52 @@ exports.department_single = async (req, res) => {
 exports.department_create = async (req, res) => {
   let { error } = validateDepartment(req.body);
   if (error) res.status(400).json(error);
-  console.log("i went off");
+
   const department = new Department({
     name: req.body.name,
+    department_head: req.body.department_head,
     teachers: [],
     lessons: [],
   });
   try {
     let exists = await Helper.inDatabase(Department, "name", req.body.name);
-    if (!exists) {
-      if (req.body.teachers) {
-        req.body.teachers.forEach((teacher) =>
-          department.teachers.push(teacher)
-        );
-      }
-      if (req.body.lessons) {
-        req.body.lessons.forEach((lesson) => department.lesson.push(lesson));
-      }
-      const saved = await department.save();
-      return res.json(saved);
+    if (exists) {
+      return res.status(409).json({ message: "Department already exists" });
     }
-    return res.status(409).json({ message: "Department already exists" });
+    if (req.body.teachers) {
+      req.body.teachers.forEach((teacher) => department.teachers.push(teacher));
+    }
+    if (req.body.lessons) {
+      req.body.lessons.forEach((lesson) => department.lesson.push(lesson));
+    }
+    const saved = await department.save();
+    return res.json(saved);
   } catch (err) {
-    return res.status(400).send(`${err}`);
+    return res.status(400).json({ message: err });
   }
 };
 
 exports.department_update = async (req, res) => {
+  let { error } = validateDepartment(req.body);
+  if (error) res.status(400).json(error);
+
   try {
-    const prev = await Department.findById(req.params.id);
+    const exists = await Department.findOne({
+      _id: { $ne: req.params.id },
+      name: req.body.name,
+    });
+    if (exists)
+      return res
+        .status(409)
+        .json({ message: "There is another department with this name." });
 
-    //temp object
-    const temp = {
-      name: prev.name,
-      teachers: prev.teachers,
-      lessons: prev.lessons,
-    };
-
-    //check fields passed in
-    if (req.body.name) {
-      temp.name = req.body.name;
-    }
-    if (req.body.teacher) {
-      temp.teachers.push(req.body.teacher);
-    }
-    if (req.body.lesson) {
-      temp.lessons.push(req.body.lesson);
-    }
-
-    //Validate
-    let { error } = validateDepartment(temp);
-    if (error) res.status(400).json({ message: "Invalid inputs" });
-    //update database
     const update = await Department.updateOne(
       { _id: req.params.id },
       {
         $set: {
-          name: temp.name,
-          teachers: temp.teachers,
-          lessons: temp.lessons,
+          name: req.body.name,
+          teachers: req.body.teachers,
+          lessons: req.body.lessons,
         },
       }
     );

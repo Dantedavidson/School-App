@@ -73,16 +73,6 @@ const validateUser = (user) => {
   return schema.validate(user);
 };
 
-// const schema = {
-//     a: Joi.any()
-//         .valid('x')
-//         .when('b', { is: Joi.exist(), then: Joi.valid('y'), otherwise: Joi.valid('z') })
-//         .when('c', { is: Joi.number().min(10), then: Joi.forbidden() }),
-//     b: Joi.any(),
-//     c: Joi.number()
-// };
-
-const User = mongoose.model("user", userSchema);
 module.exports.validateAccount = validateAccount;
 module.exports.validateUser = validateUser;
-module.exports.User = User;
+module.exports.User = mongoose.model("user", userSchema);

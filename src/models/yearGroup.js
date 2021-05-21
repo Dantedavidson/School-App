@@ -5,8 +5,8 @@ const Schema = mongoose.Schema;
 
 const YearGroupSchema = new Schema({
   year_group: { type: Number, required: true, min: 7, max: 13 },
-  year_leader: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
-  students: [{ type: Schema.Types.ObjectId, ref: "Student" }],
+  year_leader: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  students: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 //Virtual for url
@@ -22,6 +22,6 @@ const validateYearGroup = (YearGroup) => {
   });
   return schema.validate(YearGroup);
 };
-const YearGroup = mongoose.model("YearGroup", YearGroupSchema);
-module.exports.YearGroup = YearGroup;
+
+module.exports.YearGroup = mongoose.model("YearGroup", YearGroupSchema);
 module.exports.validateYearGroup = validateYearGroup;

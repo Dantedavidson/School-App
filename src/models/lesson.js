@@ -7,10 +7,10 @@ const LessonSchema = new Schema({
   name: { type: String, required: true, maxLength: 100 },
   teacher: {
     type: Schema.Types.ObjectId,
-    ref: "Teacher",
+    ref: "User",
     required: true,
   },
-  students: [{ type: Schema.Types.ObjectId, ref: "Student" }],
+  students: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 const validateLesson = (Lesson) => {
@@ -21,6 +21,6 @@ const validateLesson = (Lesson) => {
   });
   return schema.validate(Lesson);
 };
-const Lesson = mongoose.model("Lesson", LessonSchema);
-module.exports.Lesson = Lesson;
+
+module.exports.Lesson = mongoose.model("Lesson", LessonSchema);
 module.exports.validateLesson = validateLesson;

@@ -9,7 +9,7 @@ exports.lesson_list = async (req, res) => {
     res.status(400).json({ message: err });
   }
 };
-
+//TODO populate teacher and students
 exports.lesson_single = async (req, res) => {
   try {
     const single = await Lesson.findById({ _id: req.params.id });
@@ -32,46 +32,44 @@ exports.lesson_create = async (req, res) => {
     if (req.body.students) {
       req.body.students.forEach((student) => lesson.students.push(student));
     }
-    if (!exists) {
-      const saved = await lesson.save();
-      return res.json({ saved: saved, message: "Lesson saved" });
+    if (exists) {
+      return res
+        .status(409)
+        .json({ message: "Lesson already exists in database" });
     }
-    return res
-      .status(409)
-      .json({ message: "Lesson already exists in database" });
+    const saved = await lesson.save();
+    return res.json({ saved: saved, message: "Lesson saved" });
   } catch (err) {
     res.status(400).json({ message: err });
   }
 };
 
 exports.lesson_update = async (req, res) => {
+  let { error } = validateLesson(obj);
+  if (error) return res.status(400).json(error);
   try {
-    const prev = await Lesson.findById(req.params.id);
-    const obj = {
-      name: prev.name,
-      teacher: prev.teacher,
-      students: prev.students,
-    };
-    if (req.body.name) {
-      obj.name = req.body.name;
-    }
-    if (req.body.teacher) {
-      obj.teacher = req.body.teacher;
-    }
-    if (req.body.students.length > 0) {
-      req.body.students.forEach((student) => {
-        obj.students.includes(student) ? null : obj.students.push(student);
-      });
-    }
-    let { error } = validateLesson(obj);
-    if (error) return res.status(400).json(error);
+    const exists = await Lesson.findOne({
+      _id: { $ne: req.params.id },
+      name: req.body.name,
+    });
+    if (exists)
+      return res
+        .status(409)
+        .json({ message: "There is already a lesson with this name." });
+
     const update = await Lesson.updateOne(
       { _id: req.params.id },
-      { $set: { name: obj.name, teacher: obj.teacher, students: obj.students } }
+      {
+        $set: {
+          name: req.body.name,
+          teacher: req.body.teacher,
+          students: req.body.students,
+        },
+      }
     );
     res.json(update);
   } catch (err) {
-    res.status(400).json({ message: `${err}` });
+    res.status(400).json({ message: err });
   }
 };
 
