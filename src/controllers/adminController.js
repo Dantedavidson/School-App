@@ -1,5 +1,4 @@
 const { Admin, validateAdmin } = require("../models/admin");
-const validateLogin = require("../models/loginSchema");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 

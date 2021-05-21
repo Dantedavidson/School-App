@@ -4,6 +4,11 @@ const Joi = require("joi");
 const JoiObj = require("joi-oid");
 const { DateTime } = require("luxon");
 
+const isRequired = function (field, requiredArray) {
+  console.log(field);
+  return requiredArray.includes(field);
+};
+
 const TeacherSchema = new Schema({
   first_name: { type: String, required: true, maxLength: 100 },
   family_name: { type: String, required: true, maxLength: 100 },
