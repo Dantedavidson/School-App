@@ -42,6 +42,10 @@ const userSchema = new Schema({
   },
 });
 
+userSchema.virtual("fullname").get(function () {
+  return `${this.details.first_name}, ${this.details.family_name}`;
+});
+
 const accountSchema = Joi.object({
   username: Joi.string().min(6).max(36).required(),
   password: Joi.string().min(6).max(36).required(),
@@ -75,4 +79,4 @@ const validateUser = (user) => {
 
 module.exports.validateAccount = validateAccount;
 module.exports.validateUser = validateUser;
-module.exports.User = mongoose.model("user", userSchema);
+module.exports.User = mongoose.model("User", userSchema);

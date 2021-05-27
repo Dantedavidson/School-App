@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const auth = require("../middleware/auth");
+const permission = require("../middleware/permission");
 const adminController = require("../controllers/adminController");
 
 /// AUTHORISED ///
@@ -12,9 +14,6 @@ const adminController = require("../controllers/adminController");
 router.post("/login", adminController.admin_login);
 
 //POST create a admin
-router.post("/", adminController.admin_create);
-
-// router.post("/example",auth,controller)
-//
+router.post("/", auth, permission(["admin"]), adminController.admin_create);
 
 module.exports = router;

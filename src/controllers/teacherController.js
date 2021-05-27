@@ -53,9 +53,14 @@ exports.teacher_single = async (req, res) => {
 
 exports.year_leaders = async (req, res) => {
   try {
+    console.log("i went off");
     let year_leaders = await YearGroup.find()
       .select("year_leader year_group")
-      .populate({ path: "year_leader", select: "_id first_name family_name" });
+      .populate("year_leader");
+    //.populate("year_leader");
+
+    //select: "_id details",
+    //select: "_id details.first_name details.family_name",
     res.json(year_leaders);
   } catch (err) {
     res.status(400).json({ message: "Resource not found" });
@@ -75,32 +80,35 @@ exports.teacher_recent = async (req, res) => {
 
 exports.teacher_create = async (req, res) => {
   //validate
-  let { error } = validateUser(req.body);
+  let { error } = validateUser(req.body.teacher);
   console.log(error);
   if (error) return res.status(400).json(error);
 
   //check account info is unique
   const user = await Teacher.findOne({
     $or: [
-      { "details.email": req.body.details.email },
-      { "account.username": req.body.account.username },
+      { "details.email": req.body.teacher.details.email },
+      { "account.username": req.body.teacher.account.username },
     ],
   });
   if (user) return res.status(409).send("This user already exists");
   //hash password
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(req.body.account.password, salt);
+  const hashedPassword = await bcrypt.hash(
+    req.body.teacher.account.password,
+    salt
+  );
   const teacher = new Teacher({
     details: {
-      first_name: req.body.details.first_name,
-      family_name: req.body.details.family_name,
-      email: req.body.details.email,
-      phone: req.body.details.phone,
-      age: req.body.details.age,
+      first_name: req.body.teacher.details.first_name,
+      family_name: req.body.teacher.details.family_name,
+      email: req.body.teacher.details.email,
+      phone: req.body.teacher.details.phone,
+      age: req.body.teacher.details.age,
     },
     account: {
-      username: req.body.account.username,
-      access: req.body.account.access,
+      username: req.body.teacher.account.username,
+      access: req.body.teacher.account.access,
       password: hashedPassword,
     },
   });

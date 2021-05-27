@@ -4,6 +4,7 @@ const Helper = require("./controllerHelperFunctions");
 exports.department_list = async (req, res) => {
   try {
     let all = await Department.find();
+    console.log(all);
     res.json(all);
   } catch (err) {
     res.status(400).json({ message: err });
