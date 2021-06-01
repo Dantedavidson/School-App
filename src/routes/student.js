@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const permission = require("../middleware/permission");
+const authId = require("../middleware/authId");
 const studentController = require("../controllers/studentController");
 
 ///GENERAL///
@@ -25,7 +26,13 @@ router.post("/", studentController.student_create);
 
 /// AUTHORISED ///
 //PUT update student details
-router.put("/:id", studentController.student_update);
+router.put(
+  "/:id",
+  auth,
+  permisssion(["student"]),
+  authId(false),
+  studentController.student_update
+);
 
 //POST login as student
 
@@ -38,6 +45,7 @@ router.delete(
   "/:id",
   auth,
   permission(["student", "admin"]),
+  authId(true),
   studentController.student_remove
 );
 

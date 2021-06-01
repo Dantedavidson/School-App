@@ -3,21 +3,22 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const permission = require("../middleware/permission");
+const authId = require("../middleware/authId");
 const teacherController = require("../controllers/teacherController");
 
 ///GENERAL///
 
 //GET recent teachers
-router.get("/recent", teacherController.teacher_recent);
+router.get("/recent", auth, teacherController.teacher_recent);
 
 //GET year leaders
-router.get("/year-leaders", teacherController.year_leaders);
+router.get("/year-leaders", auth, teacherController.year_leaders);
 
 //GET all teachers
-router.get("/", teacherController.teacher_list);
+router.get("/", auth, teacherController.teacher_list);
 
 //GET single teacher
-router.get("/:id", teacherController.teacher_single);
+router.get("/:id", auth, teacherController.teacher_single);
 
 /// AUTHORISED ///
 
@@ -25,7 +26,8 @@ router.get("/:id", teacherController.teacher_single);
 router.put(
   "/:id",
   auth,
-  permission(["teacher", "admin"]),
+  permission(["teacher"]),
+  authId(false),
   teacherController.teacher_update
 );
 
@@ -43,6 +45,7 @@ router.delete(
   "/:id",
   auth,
   permission(["teacher", "admin"]),
+  authId(true),
   teacherController.teacher_remove
 );
 

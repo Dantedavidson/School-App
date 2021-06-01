@@ -6,10 +6,10 @@ const yearGroupController = require("../controllers/yearGroupController");
 
 ///GENERAL///
 //GET all yeargroups
-router.get("/", yearGroupController.yearGroup_list);
+router.get("/", auth, yearGroupController.yearGroup_list);
 
 //GET single yeargroup
-router.get("/:id", yearGroupController.yearGroup_single);
+router.get("/:id", auth, yearGroupController.yearGroup_single);
 
 ///ADMIN///
 //POST create a yeargroup
