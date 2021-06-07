@@ -1,9 +1,21 @@
 const { Lesson, validateLesson } = require("../models/lesson");
 const Helper = require("./controllerHelperFunctions");
+const User = require("../models/user");
 
 exports.lesson_list = async (req, res) => {
   try {
-    const all = await Lesson.find();
+    const all = await Lesson.find().populate([
+      {
+        path: "students",
+        model: "User",
+        select: "details fullname",
+      },
+      {
+        path: "teacher",
+        model: "User",
+        select: "details fullname",
+      },
+    ]);
     res.json(all);
   } catch (err) {
     res.status(400).json({ message: err });
@@ -12,7 +24,18 @@ exports.lesson_list = async (req, res) => {
 //TODO populate teacher and students
 exports.lesson_single = async (req, res) => {
   try {
-    const single = await Lesson.findById({ _id: req.params.id });
+    const single = await Lesson.findById({ _id: req.params.id }).populate([
+      {
+        path: "students",
+        model: "User",
+        select: "details fullname",
+      },
+      {
+        path: "teacher",
+        model: "User",
+        select: "details fullname",
+      },
+    ]);
     res.json(single);
   } catch (err) {
     res.status(400).json({ message: err });
@@ -45,7 +68,7 @@ exports.lesson_create = async (req, res) => {
 };
 
 exports.lesson_update = async (req, res) => {
-  let { error } = validateLesson(obj);
+  let { error } = validateLesson(req.body);
   if (error) return res.status(400).json(error);
   try {
     const exists = await Lesson.findOne({

@@ -5,11 +5,31 @@ const {
 } = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { YearGroup } = require("../models/yearGroup");
+const { Lesson } = require("../models/lesson");
 
 exports.student_list = async (req, res) => {
   try {
+    let tempArr = [];
     const all = await Student.find({ "account.access": "student" });
-    res.json(all);
+    for await (student of all) {
+      let yeargroup = await YearGroup.find({ students: student._id }).select(
+        "year_group"
+      );
+      const tempObj = {
+        details: {
+          ...student.details.toObject(),
+          yeargroup: yeargroup[0],
+        },
+        account: {
+          ...student.account.toObject(),
+        },
+        _id: student._id,
+      };
+      tempArr.push(tempObj);
+    }
+
+    res.json(tempArr);
   } catch (err) {
     res.status(400).json({ message: err });
   }
@@ -17,10 +37,27 @@ exports.student_list = async (req, res) => {
 
 exports.student_single = async (req, res) => {
   try {
-    const single = await Student.findById(req.params.id);
-    res.json(single);
+    const student = await Student.findById(req.params.id);
+    const yeargroup = await YearGroup.find({ students: student._id }).select(
+      "year_group"
+    );
+    const lessons = await Lesson.find({ students: student._id }).select(
+      "name teacher"
+    );
+    const tempObj = {
+      details: {
+        ...student.details.toObject(),
+        yeargroup: yeargroup[0],
+        lessons: lessons,
+      },
+      account: {
+        ...student.account.toObject(),
+      },
+      _id: student._id,
+    };
+    res.json(tempObj);
   } catch (err) {
-    res.status(400).json({ message: err });
+    res.status(400).json({ message: `${err}` });
   }
 };
 
@@ -36,8 +73,8 @@ exports.student_recent = async (req, res) => {
 };
 
 exports.student_create = async (req, res) => {
-  let { error } = validateUser(req.body);
-  if (error) return res.status(400).json({ message: error });
+  //let { error } = validateUser(req.body);
+  //if (error) return res.status(400).json({ message: error });
 
   //check account info is unique
   const user = await Student.findOne({

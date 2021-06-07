@@ -24,12 +24,10 @@ exports.teacher_list = async (req, res) => {
         "name"
       );
       all.push({
-        teacher: {
-          ...teacher._doc,
-          fullname: teacher.fullname,
-          department:
-            department.length > 0 ? department[0].name : "No Department",
-        },
+        ...teacher._doc,
+        fullname: teacher.fullname,
+        department:
+          department.length > 0 ? department[0].name : "No Department",
       });
     }
 
@@ -80,9 +78,8 @@ exports.teacher_recent = async (req, res) => {
 
 exports.teacher_create = async (req, res) => {
   //validate
-  let { error } = validateUser(req.body.teacher);
-  console.log(error);
-  if (error) return res.status(400).json(error);
+  //let { error } = validateUser(req.body.teacher);
+  //if (error) return res.status(400).json(error);
 
   //check account info is unique
   const user = await Teacher.findOne({

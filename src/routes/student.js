@@ -16,7 +16,11 @@ router.get(
 );
 
 //GET all students
-router.get("/", auth, studentController.student_list);
+router.get(
+  "/",
+  //auth,
+  studentController.student_list
+);
 
 //GET single student
 router.get("/:id", auth, studentController.student_single);
@@ -29,7 +33,7 @@ router.post("/", studentController.student_create);
 router.put(
   "/:id",
   auth,
-  permisssion(["student"]),
+  permission(["student"]),
   authId(false),
   studentController.student_update
 );

@@ -1,6 +1,3 @@
-//TODO Write this function to optionally check for user id match id route. If too messy create seperate middleware to permite based on id
-const jwt = require("jsonwebtoken");
-
 function permission(role) {
   return function (req, res, next) {
     if (!role.includes(req.user.access)) {

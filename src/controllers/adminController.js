@@ -33,6 +33,7 @@ exports.admin_create = async (req, res) => {
 };
 
 exports.admin_login = async (req, res) => {
+  console.log("i went off");
   //Validate login details
   const { error } = validateAccount(req.body);
   if (error) return res.status(400).json({ message: "Invalid Inputs" });

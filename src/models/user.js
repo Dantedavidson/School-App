@@ -42,16 +42,54 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.virtual("fullname").get(function () {
-  return `${this.details.first_name}, ${this.details.family_name}`;
+//Model methods
+//TODO handle orphans/make admin provide new teacher
+//Delete all references to teacher
+userSchema.pre("deleteOne", async function (next) {
+  const userId = this.getQuery()["_id"];
+
+  mongoose
+    .model("Department")
+    .updateMany(
+      { teachers: userId },
+      { $pull: { teachers: `${userId}` } },
+      function (err, result) {
+        if (err) {
+          return res.json({
+            message: "Something went wrong when deleting from department",
+          });
+        }
+      }
+    );
+  mongoose
+    .model("Lesson")
+    .deleteMany({ teacher: userId }, function (err, result) {
+      if (err) {
+        return res.json({
+          message: "Something went wrong when removing from lesson",
+        });
+      }
+    });
+  mongoose
+    .model("Lesson")
+    .updateMany({ students: userId }, { $pull: { students: userId } });
+  mongoose.model("YearGroup");
 });
+
+userSchema.virtual("fullname").get(function () {
+  return `${this.details.first_name} ${this.details.family_name}`;
+});
+//allows virtuals to be populated
+userSchema.set("toObject", { virtuals: true });
+userSchema.set("toJSON", { virtuals: true });
+
+//Joi schema
 
 const accountSchema = Joi.object({
   username: Joi.string().min(6).max(36).required(),
   password: Joi.string().min(6).max(36).required(),
   access: Joi.string().valid("teacher", "student", "admin").required(),
 });
-
 const validateAccount = (account) => {
   return accountSchema.validate(account);
 };
