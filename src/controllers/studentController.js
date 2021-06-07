@@ -12,23 +12,25 @@ exports.student_list = async (req, res) => {
   try {
     let tempArr = [];
     const all = await Student.find({ "account.access": "student" });
+
     for await (student of all) {
       let yeargroup = await YearGroup.find({ students: student._id }).select(
         "year_group"
       );
+
       const tempObj = {
         details: {
           ...student.details.toObject(),
+          fullname: student.fullname,
           yeargroup: yeargroup[0],
         },
         account: {
-          ...student.account.toObject(),
+          enrolled: student.account.enrolled,
         },
-        _id: student._id,
+        id: student._id,
       };
       tempArr.push(tempObj);
     }
-
     res.json(tempArr);
   } catch (err) {
     res.status(400).json({ message: err });
@@ -51,9 +53,9 @@ exports.student_single = async (req, res) => {
         lessons: lessons,
       },
       account: {
-        ...student.account.toObject(),
+        enrolled: student.account.enrolled,
       },
-      _id: student._id,
+      id: student._id,
     };
     res.json(tempObj);
   } catch (err) {
@@ -66,9 +68,23 @@ exports.student_recent = async (req, res) => {
     const recent = await Student.find({ "account.access": "student" })
       .sort({ "account.enrolled": -1 })
       .limit(5);
-    res.json(recent);
+    const tempArr = [];
+    recent.forEach((item) => {
+      const tempObj = {
+        details: {
+          ...item.details.toObject(),
+          fullname: item.fullname,
+        },
+        account: {
+          enrolled: item.account.enrolled,
+        },
+      };
+      tempArr.push(tempObj);
+    });
+
+    res.json(tempArr);
   } catch (err) {
-    res.status(400).json({ message: err });
+    res.status(400).json({ message: `${err}` });
   }
 };
 

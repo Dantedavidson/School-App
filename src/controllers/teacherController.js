@@ -18,20 +18,27 @@ exports.teacher_list = async (req, res) => {
     let teachers = await Teacher.find({ "account.access": "teacher" }).sort({
       "details.family_name": 1,
     });
-    let all = [];
+    let tempArr = [];
     for await (teacher of teachers) {
       let department = await Department.find({ teachers: teacher._id }).select(
         "name"
       );
-      all.push({
-        ...teacher._doc,
-        fullname: teacher.fullname,
-        department:
-          department.length > 0 ? department[0].name : "No Department",
-      });
+      const tempObj = {
+        details: {
+          ...teacher.details.toObject(),
+          department:
+            department.length > 0 ? department[0].name : "No Department",
+          fullname: teacher.fullname,
+        },
+        account: {
+          enrolled: teacher.account.enrolled,
+        },
+        id: teacher._id,
+      };
+      tempArr.push(tempObj);
     }
 
-    res.json(all);
+    res.json(tempArr);
   } catch (err) {
     res.status(400).json({ message: err });
   }
@@ -42,8 +49,20 @@ exports.teacher_single = async (req, res) => {
     let department = await Department.find({
       teachers: `${req.params.id}`,
     });
-    let single = await Teacher.findById(req.params.id);
-    res.json({ teacher_info: single, department_info: department });
+    let teacher = await Teacher.findById(req.params.id);
+    const tempObj = {
+      details: {
+        ...teacher.details.toObject(),
+        department:
+          department.length > 0 ? department[0].name : "No Department",
+        fullname: teacher.fullname,
+      },
+      account: {
+        enrolled: teacher.account.enrolled,
+      },
+      id: teacher._id,
+    };
+    res.json(tempObj);
   } catch (err) {
     res.status(400).json({ message: err });
   }
