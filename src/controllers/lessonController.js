@@ -4,6 +4,7 @@ const User = require("../models/user");
 
 exports.lesson_list = async (req, res) => {
   try {
+    let tempArr = [];
     const all = await Lesson.find().populate([
       {
         path: "students",
@@ -16,6 +17,16 @@ exports.lesson_list = async (req, res) => {
         select: "details fullname",
       },
     ]);
+    for await (lesson of all) {
+      const department = await Department.find({ lessons: lesson._id }).select(
+        "name"
+      );
+      let tempObj = {
+        ...lesson.toObject(),
+        department: department.name,
+      };
+      tempArr.push(tempObj);
+    }
     res.json(all);
   } catch (err) {
     res.status(400).json({ message: err });

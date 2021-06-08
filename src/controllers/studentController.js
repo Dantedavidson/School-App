@@ -14,15 +14,17 @@ exports.student_list = async (req, res) => {
     const all = await Student.find({ "account.access": "student" });
 
     for await (student of all) {
-      let yeargroup = await YearGroup.find({ students: student._id }).select(
+      let yeargroup = await YearGroup.findOne({ students: student._id }).select(
         "year_group"
       );
-
+      console.log(yeargroup);
       const tempObj = {
         details: {
           ...student.details.toObject(),
           fullname: student.fullname,
-          yeargroup: yeargroup[0],
+          yeargroup: yeargroup
+            ? yeargroup.year_group.toString()
+            : "No Yeargroup",
         },
         account: {
           enrolled: student.account.enrolled,
@@ -33,14 +35,14 @@ exports.student_list = async (req, res) => {
     }
     res.json(tempArr);
   } catch (err) {
-    res.status(400).json({ message: err });
+    res.status(400).json({ message: `${err}` });
   }
 };
 
 exports.student_single = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
-    const yeargroup = await YearGroup.find({ students: student._id }).select(
+    const yeargroup = await YearGroup.findOne({ students: student._id }).select(
       "year_group"
     );
     const lessons = await Lesson.find({ students: student._id }).select(
@@ -49,7 +51,7 @@ exports.student_single = async (req, res) => {
     const tempObj = {
       details: {
         ...student.details.toObject(),
-        yeargroup: yeargroup[0],
+        yeargroup: yeargroup ? yeargroup.year_group.toString() : "No Yeargroup",
         lessons: lessons,
       },
       account: {

@@ -5,7 +5,7 @@ const Helper = require("./controllerHelperFunctions");
 
 exports.yearGroup_list = async (req, res) => {
   try {
-    const all = await YearGroup.find();
+    const all = await YearGroup.find().sort("year_group");
     res.json(all);
   } catch (err) {
     res.status(400).json({ message: err });
